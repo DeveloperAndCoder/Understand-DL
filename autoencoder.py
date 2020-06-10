@@ -20,12 +20,12 @@ print("runnum = ", runnum)
 
 save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
 Path("saved_models/" + runnum).mkdir(parents=True, exist_ok=True)
-logfolder = 'Log/' + runnum
+logfolder = 'Log/' + runnum + '/Autoencoder'
 Path(logfolder).mkdir(parents=True, exist_ok=True)
 checkpoint_dir = 'checkpoint/' + runnum + '/Autoencoder/'
 Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
-csv_logger = CSVLogger(logfolder + '/Autoencoder_log.csv', append=True, separator=';')
+csv_logger = CSVLogger(os.path.join(logfolder,'Autoencoder_log.csv'), append=True, separator=';')
 checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
 checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=True, mode='auto', period=5, verbose=1)
 

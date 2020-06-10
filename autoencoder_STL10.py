@@ -20,14 +20,14 @@ print("runnum = ", runnum)
 
 save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
 Path("saved_models/" + runnum).mkdir(parents=True, exist_ok=True)
-logfolder = 'Log/' + runnum
+logfolder = 'Log/' + runnum + '/Autoencoder/'
 Path(logfolder).mkdir(parents=True, exist_ok=True)
 checkpoint_dir = 'checkpoint/' + runnum + '/Autoencoder/'
 Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
-csv_logger = CSVLogger(logfolder + '/Autoencoder_log.csv', append=True, separator=';')
+csv_logger = CSVLogger(os.path.join(logfolder,'Autoencoder_log.csv'), append=True, separator=';')
 checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=True, mode='auto', period=5, verbose=1)
+checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=True, mode='auto', period=10, verbose=1)
 
 model_name = 'autoencoder.h5'
 
@@ -56,7 +56,7 @@ def sbscompare(images1, images2, length, height):
 model = Sequential()
 
 model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', activation='relu', input_shape=(96, 96, 3)))
-model.add(BatchNormalization())  # 32x32x32 # 224x224x16
+model.add(BatchNormalization())  # 32x32x32 # 224x224x16 # 96x96x16
 model.add(Conv2D(16, kernel_size=3, strides=2, padding='same', activation='relu'))  # 16x16x32 112x112x16 48x48x16
 model.add(Conv2D(16, kernel_size=3, strides=1, padding='same', activation='relu'))  # 16x16x32 112x112x16 48x48x16
 model.add(BatchNormalization())  # 32x32x32 # 112x112x16 48x48x16
