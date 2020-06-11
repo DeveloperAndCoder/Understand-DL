@@ -6,6 +6,7 @@ It gets to 75% validation accuracy in 25 epochs, and 79% after 50 epochs.
 '''
 
 import keras
+import keras.backend as K
 import tensorflow as tf
 from keras.layers import Dense
 #import tensorflow.keras.preprocessing.image.image_dataset_from_directory
@@ -37,7 +38,7 @@ Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
 csv_logger = CSVLogger(log_dir + "classifier_log.csv", append=True, separator=';')
 checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=5, verbose=1)
+checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=10, verbose=1)
 
 batch_size = 32
 num_of_classes = 10
@@ -102,9 +103,18 @@ model.summary()
 
 model.summary()
 
+def loss_func(y_true, y_pred):
+    y_true = K.print_tensor(y_true, message='y_true = ')
+    y_pred = K.print_tensor(y_pred, message='y_pred = ')
+    cce = tf.keras.losses.CategoricalCrossentropy()
+    loss = cce(y_true, y_pred)
+    return loss
+
 model.compile(loss='categorical_crossentropy',
-              optimizer='rmsprop',
-              metrics=['accuracy'])
+              optimizer='sgd',
+              metrics=['categorical_accuracy'],
+              # loss=loss_func
+            )
 
 model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger, checkpoint])
 # Save model and weights
