@@ -8,10 +8,11 @@ It gets to 75% validation accuracy in 25 epochs, and 79% after 50 epochs.
 import keras
 import keras.backend as K
 import tensorflow as tf
-from keras.layers import Dense
+from keras.optimizers import SGD
+from keras.layers import Dense, Flatten, Input, Dropout
 #import tensorflow.keras.preprocessing.image.image_dataset_from_directory
 from keras.applications import VGG16
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.callbacks import CSVLogger, ModelCheckpoint
 import sys
 import os
@@ -36,15 +37,10 @@ Path(save_dir).mkdir(parents=True, exist_ok=True)
 Path(log_dir).mkdir(parents=True, exist_ok=True)
 Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
-csv_logger = CSVLogger(log_dir + "classifier_log.csv", append=True, separator=';')
-checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=10, verbose=1)
-
 batch_size = 32
 num_of_classes = 10
-num_epochs = 250
+num_epochs = 20
 # save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
-model_name = 'classifier.h5'
 
 
 # The data, split between train and test sets:
@@ -85,21 +81,41 @@ train_ds = image_dataset_from_directory(
 '''
 
 
-vgg16 = VGG16(
+baseModel = VGG16(
+    weights="imagenet",
     include_top=False,
-    pooling='max',
+    # pooling='max',
     input_shape = (96,96,3)
     )
-model = Sequential()
-model.add(vgg16)
-model.add(Dense(64, activation='relu'))
-model.add(Dense(10, activation='softmax'))
-model.summary()
 
-#model = keras.models.Sequential()
-#model.add(VGG16(include_top=False, input_shape=(96,96,3)))
-#model.add(Flatten())
-#model.add(Dense(num_of_classes))
+baseModel.summary()
+
+headModel = baseModel.output
+headModel = Flatten(name="flatten")(headModel)
+headModel = Dense(512, activation="relu")(headModel)
+headModel = Dropout(0.5)(headModel)
+headModel = Dense(num_of_classes, activation="softmax")(headModel)
+
+model = Model(inputs=baseModel.input, outputs=headModel)
+
+# loop over all layers in the base model and freeze them so they will
+# *not* be updated during the first training process
+for layer in baseModel.layers:
+    layer.trainable = False
+
+# loop over the layers in the model and show which ones are trainable
+# or not
+for layer in baseModel.layers:
+    print("{}: {}".format(layer, layer.trainable))
+
+
+
+# headModel = Sequential()
+# headModel.add(baseModel)
+# headModel.add(Dense(64, activation='relu'))
+# headModel.add(Dense(num_of_classes, activation='softmax'))
+# headModel.summary()
+
 
 model.summary()
 
@@ -110,21 +126,56 @@ def loss_func(y_true, y_pred):
     loss = cce(y_true, y_pred)
     return loss
 
+
+opt = SGD(lr=1e-4, momentum=0.9)
 model.compile(loss='categorical_crossentropy',
-              optimizer='sgd',
+              optimizer=opt,
               metrics=['categorical_accuracy'],
               # loss=loss_func
             )
 
-model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger, checkpoint])
+csv_logger1 = CSVLogger(log_dir + "before_classifier_log.csv", append=True, separator=';')
+checkpoint_template1 = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
+checkpoint1 = ModelCheckpoint(checkpoint_template1, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
+
+model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger1, checkpoint1])
+
 # Save model and weights
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
-model_path = os.path.join(save_dir, model_name)
+
+model_path = os.path.join(save_dir, 'before_classifier.h5')
 model.save(model_path)
 print('Saved trained model at %s ' % model_path)
 
 # Score trained model.
 scores = model.evaluate(x_test, y_test, verbose=1)
-print('Test loss:', scores[0])
-print('Test accuracy:', scores[1])
+print('Test loss before:', scores[0])
+print('Test accuracy before:', scores[1])
+
+# now that the head FC layers have been trained/initialized, lets
+# unfreeze the final set of CONV layers and make them trainable
+for layer in baseModel.layers[15:]:
+    layer.trainable = True
+# loop over the layers in the model and show which ones are trainable
+# or not
+for layer in baseModel.layers:
+    print("{}: {}".format(layer, layer.trainable))
+
+# for the changes to the model to take affect we need to recompile
+# the model, this time using SGD with a *very* small learning rate
+print("[INFO] re-compiling model...")
+opt = SGD(lr=1e-4, momentum=0.9)
+model.compile(loss="categorical_crossentropy", optimizer=opt,
+	metrics=["accuracy"])
+
+csv_logger2 = CSVLogger(log_dir + "after_classifier_log.csv", append=True, separator=';')
+checkpoint_template2 = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
+checkpoint2 = ModelCheckpoint(checkpoint_template2, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
+
+# train the model again, this time fine-tuning *both* the final set
+# of CONV layers along with our set of FC layers
+model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger2, checkpoint2])
+
+model_path = os.path.join(save_dir, 'after_classifier.h5')
+model.save(model_path)
