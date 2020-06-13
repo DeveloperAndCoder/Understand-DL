@@ -6,18 +6,31 @@ import sys
 import collect_data
 import argparse
 
+import stl_model
+
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--runnum", required=True,
 	help="Run number: eg stl10_4")
-ap.add_argument("-m", "--model", required=True,
-	help="Model name: classifier, combined, autoencoder, etc.")
+ap.add_argument("-m", "--model", required=False,
+	help="Model name: classifier, combined, autoencoder, etc.", default="")
+ap.add_argument("-mp", "--model_path", required=False,
+	help="Relative path to model", default="")
+
+ap.add_argument('--weight', dest='weight', action='store_true')
+ap.add_argument('--no-weight', dest='weight', action='store_false')
+ap.set_defaults(weight=False)
+
 ap.add_argument("-d", "--dataset", required=True,
 	help="Dataset name: cifar, stl")
 args = vars(ap.parse_args())
 
+print(args)
+
 runnum = args["runnum"]
 modelname = args["model"]
+modelpath = args["model_path"]
 dataset = args["dataset"]
+# modelarch = args["architecture"]
 
 runnum.strip()
 print("runnum:", runnum)
@@ -30,10 +43,15 @@ def make_array(y):
         a[i][y[i][0]] = 1
     return np.asarray(a)
 
+path = modelpath if modelpath else os.path.join(save_dir, modelname)
+model = None
+if args["weight"]:
+    model = stl_model.model
+    model.load_weights(path)
+else:
+    model = load_model(path)
 
-model = load_model(os.path.join(save_dir, modelname))
-
-print('Loaded model', modelname)
+print('Loaded model at path', path)
 
 (x_train, y_train), (x_test, y_test) = ([], []), ([], [])
 if dataset == "stl":

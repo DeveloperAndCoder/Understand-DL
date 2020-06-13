@@ -18,12 +18,23 @@ from keras.preprocessing.image import img_to_array
 from keras.applications.vgg16 import preprocess_input
 from keras.applications.vgg16 import decode_predictions
 from keras.applications.vgg16 import VGG16
+import argparse
 
-if(len(sys.argv) != 2) :
-    print('There need to be only one argument - Run number given')
-    exit(1)
+ap = argparse.ArgumentParser()
+ap.add_argument("-r", "--runnum", required=True,
+	help="Run number: eg stl10_4")
+ap.add_argument("-a", "--autoencoder", required=False,
+	help="Relative path to autoencoder", default="")
+ap.add_argument("-c", "--classifier", required=False,
+	help="Relative path to classifier", default="")
 
-runnum = str(sys.argv[1])
+args = vars(ap.parse_args())
+
+runnum = args["runnum"]
+autoencoder_path = args["autoencoder"]
+classifier_path = args["classifier"]
+# dataset = args["dataset"]
+
 runnum.strip()
 print("runnum:", runnum)
 
@@ -37,17 +48,24 @@ Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
 csv_logger = CSVLogger(log_dir + "combined_log.csv", append=True, separator=';')
 checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=True, mode='auto', period=1, verbose=1)
+checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=10, verbose=1)
 
 autoencoder_dir = save_dir
 
+if autoencoder_path == "":
+    autoencoder_path = autoencoder_dir + 'autoencoder.h5'
+
 #autoencoder = load_model('saved_models/autoencoder.h5')
-autoencoder = load_model(autoencoder_dir + 'autoencoder.h5')
+autoencoder = load_model(autoencoder_path)
 # classifier model= load_model(save_dir+'/classifier.h5')
 num_of_classes = 10
 
 vgg = True
-classifier = load_model(save_dir + 'classifier.h5')
+
+if classifier_path == "":
+    classifier_path = save_dir + 'classifier.h5'
+
+classifier = load_model(classifier_path)
 # vgg16 = VGG16(
 #     include_top=False,
 #     pooling='max',
@@ -106,7 +124,7 @@ combined = Model(inputs, outputs)
 # combined.add(Dense(10, activation='softmax'))
 combined.summary()
 
-num_epochs=1000
+num_epochs=250
 adam = keras.optimizers.Adam(learning_rate=1e-5)
 
 def get_map():
@@ -140,7 +158,7 @@ else :
     combined.compile(optimizer=adam, metrics=['accuracy'], loss='mean_squared_error')
 print("Compiled!!!!")
 
-combined.fit(x_train, y_train, epochs=num_epochs, callbacks=[csv_logger, checkpoint])
+combined.fit(x_train, y_train, validation_data = (x_test, y_test), epochs=num_epochs, callbacks=[csv_logger, checkpoint])
 save_dir = os.path.join(os.getcwd(), save_dir + "combined/")
 
 model_name = 'f_auto.h5'
