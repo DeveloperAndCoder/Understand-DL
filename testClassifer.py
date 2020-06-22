@@ -13,28 +13,12 @@ import keras.backend as kb
 import keras.optimizers
 import matplotlib.pyplot as plt
 from keras import Model
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 from PIL import Image
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 import os
 from keras.callbacks import CSVLogger
 import cv2
 import collect_data
 from tqdm import tqdm
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 from unet_model import custom_loss
 import argparse
 from pathlib import Path
@@ -79,29 +63,6 @@ for c in class_names:
         Path('Images/' + runnum + '/' + c).mkdir(parents=True, exist_ok=True)
     except:
         pass
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-
-csv_logger = CSVLogger('Log/log.csv', append=True, separator=';')
-save_dir = 'saved_models/imagenet_2'
-autoencoder = load_model(save_dir + '/autoencoder.h5')
-# classifier = load_model(save_dir + '/classifier.h5')
-# print(x_train.shape, y_train.shape)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 
 def make_array(y, num_of_classes = 10):
     a = [[0]*num_of_classes for i in range(y.shape[0])]
@@ -111,10 +72,6 @@ def make_array(y, num_of_classes = 10):
 
 
 # (x_train, y_train), (x_test, y_test) = cifar10.load_data()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 # (x_train, y_train), (x_test, y_test) = collect_data.Imagenet.load_data(collect_data.Imagenet(), toResize=True, dims=(224,224))
 (x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
 x_train = x_train / 255
@@ -129,48 +86,15 @@ def form_collage(nplistA, nplistB, sdir):
         return
     #t = tqdm(total = len(nplistA))
     for i in range(0, nplistA.shape[0]):
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-(x_train, y_train), (x_test, y_test) = collect_data.Imagenet.load_data(collect_data.Imagenet(), toResize=True, dims=(224,224))
-x_train = x_train / 255
-x_test = x_test / 255
-y_test = make_array(y_test, 1000)
-y_train = make_array(y_train, 1000)
-
-def form_collage(nplistA, nplistB, filepath):
-    if nplistA.size != nplistB.size:
-        print('Cannot save images: list a and b are of different size, ', nplistA.shape, nplistB.shape)
-        return
-    t = tqdm(total = len(nplistA))
-    for i in range(0, len(nplistA)):
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
         predimg = nplistA[i]
         testimg = nplistB[i]
         testimg *= 255
         predimg *= 255
         concat = np.concatenate((testimg, predimg), axis=1)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         #print(concat.shape)
         name =  '{:04d}.png'.format(i)
         #img = Image.fromarray(concat)
-        print('Saving image', os.path.join(sdir, name))
+        # print('Saving image', os.path.join(sdir, name))
         cv2.imwrite(os.path.join(sdir, name), concat)
         #print('saved', name)
         #t.update(1)
@@ -194,39 +118,6 @@ def test_combined():
     # for image, label in zip(x_test, y_test):
     feat_classifier = classifier.predict(x_test)
     feat_combined = combined.predict(x_test)
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-        cv2.imwrite(filepath + str(i) + '.png', concat)
-        t.update(1)
-
-def test_autoencoder():
-    pred_imgs = autoencoder.predict(x_test)
-    # plt.imshow(sbscompare(x_test, pred_imgs, 20, 20))
-    plt.axis('off')
-    #plt.rcParams["figure.figsize"] = [60, 60]
-    form_collage(pred_imgs, x_test, 'AutoEncoderResults/result')
-
-def test_combined():
-    combined = load_model(save_dir + '/w_combined.h5')
-    print('Predicting...')
-    # for image, label in zip(x_test, y_test):
-    feat_classifier = classifier.predict(x_train)
-    feat_combined = combined.predict(x_train)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
     # print(pred.shape, y_test.shape)
     print('Prediction complete')
 
@@ -234,10 +125,6 @@ def test_combined():
     y_wrong = []  # np.empty((0, y_test.shape[1]))
     # x_wrong = np.empty(x_test.shape[1:])
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     orig_wrong = 0
     comb_wrong = 0
 
@@ -247,26 +134,6 @@ def test_combined():
     class_wrong_comb_right_img = []
     class_wrong_comb_right_auto = []
 
-=======
-    autoencoder_output = []
-    pred_img_autoencoder = autoencoder.predict(x_test)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    autoencoder_output = []
-    pred_img_autoencoder = autoencoder.predict(x_test)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    autoencoder_output = []
-    pred_img_autoencoder = autoencoder.predict(x_test)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    autoencoder_output = []
-    pred_img_autoencoder = autoencoder.predict(x_test)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
     for i in range(0, len(x_test)):
         # feat = feats[i]
         # train_img = np.asarray(x_train[i]).reshape((-1, x_train[i].shape[0], x_train[i].shape[1], x_train[i].shape[2]))
@@ -274,10 +141,6 @@ def test_combined():
         pred_class_classifer = np.argmax(feat_classifier[i])
         pred_class_combined = np.argmax(feat_combined[i])
         true_class = np.argmax(y_test[i])
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         #cv2.imwrite('Images/{}/{:03d}.png'.format(class_names[pred_class_combined], i), x_test[i]*255)
         #print('{}\t{}\t{}'.format(pred_class_classifer, pred_class_combined, true_class))
         # print(label, label.shape, label.shape[0])
@@ -300,42 +163,11 @@ def test_combined():
             # label = np.asarray(label).reshape((-1, label.shape[0]))
             # print(label.shape, y_wrong.shape)
             # y_wrong.append(y_test[i])  # = np.append(label, y_wrong, axis = 0)
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-        # print(label, label.shape, label.shape[0])
-        # print(pred_class, label, true_class)
-        if pred_class_classifer != true_class and pred_class_combined == true_class:
-            # print(true_class, pred_class)
-            # print(x_wrong.shape, train_img.shape)
-            x_wrong.append(x_test[i])  # = np.append(train_img, x_wrong, axis = 0)
-            autoencoder_output.append(pred_img_autoencoder[i])
-            # label = np.asarray(label).reshape((-1, label.shape[0]))
-            # print(label.shape, y_wrong.shape)
-            y_wrong.append(y_test[i])  # = np.append(label, y_wrong, axis = 0)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 
     x_wrong = np.asarray(x_wrong)
     y_wrong = np.asarray(y_wrong)
     autoencoder_output = np.asarray(autoencoder_output)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     Path('Images/'+runnum+'/Collage/').mkdir(parents=True, exist_ok=True)
     form_collage(x_wrong, autoencoder_output, 'Images/'+runnum+'/Collage/')
@@ -356,34 +188,6 @@ def test_classifier():
     print('Predicting...')
     # for image, label in zip(x_test, y_test):
     feats = classifier.predict(x_test)
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-    form_collage(x_wrong, autoencoder_output, 'Images/Collage/')
-
-    print("Final shape = ", x_wrong.shape, y_wrong.shape)
-    print("Original shape = ", x_test.shape, y_test.shape)
-    print("Accuracy = ", 100 - ((x_wrong.shape[0] / x_test.shape[0]) * 100))
-
-def test_classifier():
-    # combined = load_model(save_dir + '/f_combined.h5')
-    print('Predicting...')
-    # for image, label in zip(x_test, y_test):
-    feats = classifier.predict(x_train)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
     # print(pred.shape, y_test.shape)
     print('Prediction complete')
 
@@ -391,30 +195,6 @@ def test_classifier():
     y_wrong = []  # np.empty((0, y_test.shape[1]))
     # x_wrong = np.empty(x_test.shape[1:])
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    x_wrong = np.asarray(x_wrong)
-    y_wrong = np.asarray(y_wrong)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    x_wrong = np.asarray(x_wrong)
-    y_wrong = np.asarray(y_wrong)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    x_wrong = np.asarray(x_wrong)
-    y_wrong = np.asarray(y_wrong)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    x_wrong = np.asarray(x_wrong)
-    y_wrong = np.asarray(y_wrong)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
     for i in range(0, len(x_test)):
         # feat = feats[i]
         # train_img = np.asarray(x_train[i]).reshape((-1, x_train[i].shape[0], x_train[i].shape[1], x_train[i].shape[2]))
@@ -431,10 +211,6 @@ def test_classifier():
             # print(label.shape, y_wrong.shape)
             y_wrong.append(y_test[i])  # = np.append(label, y_wrong, axis = 0)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     x_wrong = np.asarray(x_wrong)
     y_wrong = np.asarray(y_wrong)
 
@@ -455,28 +231,6 @@ def wrongly_classified(x_test, y_test):
             x_wrong.append(x_test[i])
             y_wrong.append(y_test[i])
     return x_wrong
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-    print("Final shape = ", x_wrong.shape, y_wrong.shape)
-    print("Original shape = ", x_test.shape, y_test.shape)
-
-    form_collage(x_wrong, x_test, 'Images/Collage/')
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 
 def test_Vgg16():
     global x_train
@@ -523,23 +277,7 @@ def test_Vgg16():
     print("Accuracy = ", 100 - ((x_wrong.shape[0] / x_test.shape[0]) * 100))
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 # test_Vgg16()
 #test_autoencoder()
 test_combined()
 # test_classifier()
-=======
-test_Vgg16()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-test_Vgg16()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-test_Vgg16()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-test_Vgg16()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377

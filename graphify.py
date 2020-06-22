@@ -1,57 +1,32 @@
 import matplotlib.pyplot as plt
 import os
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-root_dir = "Log/unet_6/combined/"
+# 'Autoencoder', 'classifier', 'combined'
+# LogOf = 'Autoencoder'
+# LogOf = 'classifier'
+# LogOf = 'combined'
+LogOf = 'unet'
 
-f = open(os.path.join(root_dir, "combined_log.csv"), 'r')
-=======
-root_dir = "Log/stl10_2/classifier"
+# LogOf = 'before_classifier'
+# LogOf = 'after_classifier'
 
-f = open(os.path.join(root_dir, "classifier_log.csv"), 'r')
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-root_dir = "Log/stl10_2/classifier"
+rootDir = LogOf
+# rootDir = 'classifier'
 
-f = open(os.path.join(root_dir, "classifier_log.csv"), 'r')
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-root_dir = "Log/stl10_2/classifier"
+root_dir = "Log/unet_3/" + rootDir
 
-f = open(os.path.join(root_dir, "classifier_log.csv"), 'r')
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-root_dir = "Log/stl10_2/classifier"
-
-f = open(os.path.join(root_dir, "classifier_log.csv"), 'r')
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
+f = open(os.path.join(root_dir, LogOf + "_log.csv"), 'r')
 #print(f.read())
 texts = f.read().split('\n')
-texts = texts[1:]
+
+offset = 1    # should be at least 1
+
+texts = texts[offset:]
 range = 1000
 #print(texts)
 
-plots = {'Accuracy': 1, 'Loss': 2}
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-plot = 'Loss'
-=======
-plot = 'Accuracy'
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plot = 'Accuracy'
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plot = 'Accuracy'
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plot = 'Accuracy'
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
+plots = {'Accuracy': 1, 'Mean Squared Error': 1, 'Loss': 2, 'validation_accuracy': 3, 'validation_loss': 4}
+plot = 'MSE'
 
 x = []
 y = []
@@ -61,9 +36,7 @@ for text in texts:
     if(len(values) >= 2):
         #print(values[0], values[1])
         x.append(float(values[0]))
-        y.append(float(values[plots[plot]]))
-        #x.append(int(values[0])+1)
-        #y.append(float(values[1]))
+        y.append(float(values[2]))
         #print(int(values[0])+1, float(values[1]))
 #plt.xticks(np.arange(0, range, range/10))
 #plt.yticks(np.arange(0, range, range/50))
@@ -71,26 +44,5 @@ plt.xlabel("Epoch")
 plt.ylabel(plot)
 #plt.yticks(np.arange(y.min(), y.max(), 0.005))
 plt.plot(x,y)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-plt.savefig('combined_'+plot)
-#plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
-#plt.show()
-=======
 plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
 plt.show()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
-plt.show()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
-plt.show()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
-plt.show()
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377

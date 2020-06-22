@@ -5,11 +5,6 @@ import json
 from PIL import Image
 import keras.utils as keras_utils
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
 def make_array(y, num_of_classes=10):
     a = [[0]*num_of_classes for i in range(y.shape[0])]
     for i in range(0,y.shape[0]):
@@ -27,14 +22,6 @@ def pre_process(x_train, y_train, x_test, y_test):
     x_test /= 255
     return (x_train, y_train), (x_test, y_test)
 
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 class Imagenet:
     image_dir = 'imagenet/images/'
 
@@ -110,23 +97,7 @@ class STL10:
     def resize(self, img, dims = (32, 32)):
         return img.resize(dims)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def load_data(self, train_perc = 80, toResize=False, dims=(32,32), preprocess = False):
-=======
     def load_data(self, train_perc = 80, toResize=False, dims=(32,32)):
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    def load_data(self, train_perc = 80, toResize=False, dims=(32,32)):
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    def load_data(self, train_perc = 80, toResize=False, dims=(32,32)):
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-    def load_data(self, train_perc = 80, toResize=False, dims=(32,32)):
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
         classes = os.listdir(self.image_dir)
 
         x_train = []
@@ -160,27 +131,12 @@ class STL10:
         y_test = np.array(y_test)
         y_train = y_train.reshape((y_train.shape[0]), 1)
         y_test = y_test.reshape((y_test.shape[0]), 1)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         print('x_train kundli', type(x_train), x_train.shape, x_train[0].shape)
 
         if preprocess:
             # pre_process(x_train, y_train, x_test, y_test)
             (x_train, y_train), (x_test, y_test) = pre_process(x_train, y_train, x_test, y_test)
-=======
         # print(type(x_train), x_train.shape, x_train[0].shape)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-        # print(type(x_train), x_train.shape, x_train[0].shape)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-        # print(type(x_train), x_train.shape, x_train[0].shape)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-        # print(type(x_train), x_train.shape, x_train[0].shape)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 
         return (x_train, y_train), (x_test, y_test)
 

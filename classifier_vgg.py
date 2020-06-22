@@ -39,23 +39,7 @@ Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
 batch_size = 32
 num_of_classes = 10
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 num_epochs = 50
-=======
-num_epochs = 20
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs = 20
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs = 20
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs = 20
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 # save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
 
 

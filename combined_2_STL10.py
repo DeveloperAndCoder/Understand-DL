@@ -20,22 +20,10 @@ from keras.applications.vgg16 import decode_predictions
 from keras.applications.vgg16 import VGG16
 import argparse
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # The GPU id to use, "0" to  "7"
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--runnum", required=True,
 	help="Run number: eg stl10_4")
@@ -43,10 +31,6 @@ ap.add_argument("-a", "--autoencoder", required=False,
 	help="Relative path to autoencoder", default="")
 ap.add_argument("-c", "--classifier", required=False,
 	help="Relative path to classifier", default="")
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 # ap.add_argument('--unet', dest='unet', action='store_true')
 # ap.add_argument('--no-unet', dest='unet', action='store_false')
 # ap.set_defaults(unet=False)
@@ -55,48 +39,12 @@ args = vars(ap.parse_args())
 
 print(args)
 
-=======
-
-args = vars(ap.parse_args())
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-
-args = vars(ap.parse_args())
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-
-args = vars(ap.parse_args())
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-
-args = vars(ap.parse_args())
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 runnum = args["runnum"]
 autoencoder_path = args["autoencoder"]
 classifier_path = args["classifier"]
 # dataset = args["dataset"]
 
 runnum.strip()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-print("runnum:", runnum)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-print("runnum:", runnum)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-print("runnum:", runnum)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-print("runnum:", runnum)
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 
 save_dir = "saved_models/" + runnum + "/"
 log_dir = "Log/" + runnum + "/combined/"
@@ -138,23 +86,7 @@ classifier = load_model(classifier_path)
 # classifier.summary()
 #classifier = Model(vgg16.inputs, classifier(vgg16.outputs))
 # exit()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 (x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
-=======
-(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 #(x_train, y_train), (x_test, y_test) = get_numpy()
 #(x_train, y_train), (x_test, y_test) = collect_data.Imagenet.load_data(collect_data.Imagenet(), toResize=True, dims=(224,224))
 # (x_train, y_train), (x_test, y_test) = cifar10.load_data()
@@ -200,30 +132,6 @@ combined = Model(inputs, outputs)
 # combined.add(Dense(10, activation='softmax'))
 combined.summary()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-num_epochs=250
-adam = keras.optimizers.Adam(learning_rate=1e-5)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs=250
-adam = keras.optimizers.Adam(learning_rate=1e-5)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs=250
-adam = keras.optimizers.Adam(learning_rate=1e-5)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
-num_epochs=250
-adam = keras.optimizers.Adam(learning_rate=1e-5)
-
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 def get_map():
     synsets = open('synsets.txt', 'r')
     wnids = []
@@ -247,56 +155,18 @@ def vgg_loss(y_true, y_pred):
     # exit(1)
     return (y_true - y_pred)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 adam = keras.optimizers.Adam(learning_rate=1e-4)
 
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 if vgg and False:
     print('using vgg loss')
     combined.compile(optimizer=adam, metrics=['accuracy'], loss=vgg_loss)
 else :
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     print('Using categorical cross entropy')
     combined.compile(optimizer=adam, metrics=['categorical_accuracy'], loss='categorical_crossentropy')
 print("Compiled!!!!")
 
 combined.fit(x_train, y_train, epochs=250, callbacks=[csv_logger, checkpoint])
 # combined.fit(x_train, y_train, validation_data = (x_test, y_test), epochs=250, callbacks=[csv_logger, checkpoint])
-=======
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-    print('Using mean sq loss')
-    combined.compile(optimizer=adam, metrics=['accuracy'], loss='mean_squared_error')
-print("Compiled!!!!")
-
-combined.fit(x_train, y_train, validation_data = (x_test, y_test), epochs=num_epochs, callbacks=[csv_logger, checkpoint])
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
-=======
->>>>>>> 0cde423e319a5c313280a0b772cbab6ad1f81377
 save_dir = os.path.join(os.getcwd(), save_dir + "combined/")
 
 model_name = 'f_auto.h5'
