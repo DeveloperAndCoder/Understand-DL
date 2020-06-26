@@ -1,38 +1,16 @@
+# https://github.com/eclique/keras-gradcam/blob/master/grad_cam.py
+
 import sys
 import os
-import glob
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 from keras import backend as K
 from keras.preprocessing import image
 from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
-from keras.models import Sequential, load_model
+
 import tensorflow as tf
 from tensorflow.python.framework import ops
-import argparse
-import collect_data
-from pathlib import Path
-from progress.bar import Bar
-from alive_progress import alive_bar
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-r", "--runnum", required=True,
-	help="Run number: eg stl10_4")
-ap.add_argument('--combined', dest='combined', action='store_true')
-ap.add_argument('--no-combined', dest='combined', action='store_false')
-ap.set_defaults(combined=False)
-ap.add_argument("-m", "--model", required=False,
-	help="Relative path to model")
-ap.add_argument("-i", "--image", required=False,
-	help="Relative path to image")
-# ap.add_argument('--unet', dest='unet', action='store_true')
-# ap.add_argument('--no-unet', dest='unet', action='store_false')
-# ap.set_defaults(unet=False)
-
-args = vars(ap.parse_args())
-
-print(args)
 
 # Define model here ---------------------------------------------------
 def build_model():
@@ -43,23 +21,18 @@ def build_model():
      - Loaded with load_model
      - Loaded from keras.applications
     """
-    if args["model"]:
-        return load_model(args["model"])
-    else:
-        return load_model("saved_models/" + args["runnum"] + "/combined/f_class.h5")
-    #return VGG16(include_top=True, weights='imagenet')
+    return VGG16(include_top=True, weights='imagenet')
 
-H, W = 96, 96 # Input shape, defined by the model (model.input_shape)
+H, W = 224, 224 # Input shape, defined by the model (model.input_shape)
 # ---------------------------------------------------------------------
 
 def load_image(path, preprocess=True):
     """Load and preprocess image."""
-    #x = image.load_img(path, target_size=(H, W))
-    x=path
+    x = image.load_img(path, target_size=(H, W))
     if preprocess:
         x = image.img_to_array(x)
         x = np.expand_dims(x, axis=0)
-        #x = preprocess_input(x)
+        x = preprocess_input(x)
     return x
 
 
@@ -122,20 +95,15 @@ def guided_backprop(input_model, images, layer_name):
 def grad_cam(input_model, image, cls, layer_name):
     """GradCAM method for visualizing input saliency."""
     y_c = input_model.output[0, cls]
-    #print('input model output:', input_model.output)
-    #tf.print('jkf', y_c)
-    #exit(1)
     conv_output = input_model.get_layer(layer_name).output
     grads = K.gradients(y_c, conv_output)[0]
     # Normalize if necessary
-    #grads = normalize(grads)
+    # grads = normalize(grads)
     gradient_function = K.function([input_model.input], [conv_output, grads])
-    
+
     output, grads_val = gradient_function([image])
     output, grads_val = output[0, :], grads_val[0, :, :, :]
-    
-    #print('output', output, 'grads_val', grads_val)
-    
+
     weights = np.mean(grads_val, axis=(0, 1))
     cam = np.dot(output, weights)
 
@@ -170,20 +138,15 @@ def grad_cam_batch(input_model, images, classes, layer_name):
     
     return new_cams
 
-def remove_images(filepath):
-    files = glob.glob(filepath + '*.jpg')
-    for f in files:
-        #print(f)
-        os.remove(f)
 
-def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='block5_conv3', cls=-1, visualize=True, save=True, filename='', num=0):
+def compute_saliency(model, guided_model, img_path, layer_name='block5_conv3', cls=-1, visualize=True, save=True):
     """Compute saliency using all three approaches.
         -layer_name: layer to compute gradients;
         -cls: class number to localize (-1 for most probable class).
     """
     preprocessed_input = load_image(img_path)
-    #predictions = model.predict(preprocessed_input)
-    '''
+
+    predictions = model.predict(preprocessed_input)
     top_n = 5
     top = decode_predictions(predictions, top=top_n)[0]
     classes = np.argsort(predictions[0])[-top_n:][::-1]
@@ -194,28 +157,17 @@ def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='
         cls = np.argmax(predictions)
     class_name = decode_predictions(np.eye(1, 1000, cls))[0][0][1]
     print("Explanation for '{}'".format(class_name))
-    '''
-    if cls == -1:
-        cls = np.argmax(predictions)
+    
     gradcam = grad_cam(model, preprocessed_input, cls, layer_name)
-    #print('\n\n', 'gradcam', gradcam.shape, type(gradcam), np.max(gradcam), np.min(gradcam), '\n\n')
     gb = guided_backprop(guided_model, preprocessed_input, layer_name)
     guided_gradcam = gb * gradcam[..., np.newaxis]
-    correctly_classified = False
-    #print('y', y)
-    #print('pred', predictions)
-    if np.argmax(predictions) == np.argmax(y):
-        correctly_classified = True
-    
+
     if save:
         jetcam = cv2.applyColorMap(np.uint8(255 * gradcam), cv2.COLORMAP_JET)
-        jetcam = (np.float32(jetcam) + load_image(img_path, preprocess=False)*255) / 2
-        Path(filename + '/gradcam/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
-        Path(filename + '/guided_backprop/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
-        Path(filename + '/guided_gradcam/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
-        cv2.imwrite(os.path.join(filename + '/gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.jpg'), np.uint8(jetcam))
-        cv2.imwrite(os.path.join(filename + '/guided_backprop/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.jpg'), deprocess_image(gb[0]))
-        cv2.imwrite(os.path.join(filename + '/guided_gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) +'.jpg'), deprocess_image(guided_gradcam[0]))
+        jetcam = (np.float32(jetcam) + load_image(img_path, preprocess=False)) / 2
+        cv2.imwrite('gradcam.jpg', np.uint8(jetcam))
+        cv2.imwrite('guided_backprop.jpg', deprocess_image(gb[0]))
+        cv2.imwrite('guided_gradcam.jpg', deprocess_image(guided_gradcam[0]))
     
     if visualize:
         plt.figure(figsize=(15, 10))
@@ -238,45 +190,8 @@ def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='
         
     return gradcam, gb, guided_gradcam
 
-def make_array(y):
-    a = [[0]*10 for i in range(y.shape[0])]
-    for i in range(y.shape[0]):
-        a[i][y[i][0]] = 1
-    return np.asarray(a)
-
-def test(filename):
-    model = build_model()
-    (x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
-    x_train = x_train/255
-    x_test = x_test/255
-    y_train = make_array(y_train)
-    y_test = make_array(y_test)
-    if args["combined"]:
-        autoencoder = load_model("saved_models/" + args["runnum"] + "/combined/f_auto.h5")
-        x_train = autoencoder.predict(x_train)
-        x_test = autoencoder.predict(x_test)
-    guided_model = build_guided_model()
-    i=0
-    x=x_test[:20]
-    y=y_test[:20]
-    predictions = model.predict(x)
-    #x = x*255
-    Path(filename + '/original/').mkdir(parents=True, exist_ok=True)
-    remove_images(filename + '/gradcam/' + str(args["combined"]))
-    remove_images(filename + '/guided_backprop/' + str(args["combined"]))
-    remove_images(filename + '/guided_gradcam/' + str(args["combined"]))
-    remove_images(filename + '/original/')
-    with alive_bar(x.shape[0]) as bar:
-        for img in x:
-            cv2.imwrite(filename + '/original/' + str(i) + '.jpg', img*255)
-            gradcam, gb, guided_gradcam = compute_saliency(model, guided_model, layer_name='block5_conv3',
-                                                img_path=img, predictions=predictions[i], y=y[i], cls=-1, visualize=False, save=True, filename=filename,num=i)
-            i=i+1
-            bar()
-
 if __name__ == '__main__':
-    test('Images/gradcam/' + args['runnum'])
-    #model = build_model()
-    #guided_model = build_guided_model()
-    #gradcam, gb, guided_gradcam = compute_saliency(model, guided_model, layer_name='block5_conv3',
-                                             #img_path=args["image"], cls=-1, visualize=True, save=True)
+    model = build_model()
+    guided_model = build_guided_model()
+    gradcam, gb, guided_gradcam = compute_saliency(model, guided_model, layer_name='block5_conv3',
+                                             img_path=sys.argv[1], cls=-1, visualize=True, save=True)
