@@ -97,7 +97,7 @@ class STL10:
     def resize(self, img, dims = (32, 32)):
         return img.resize(dims)
 
-    def load_data(self, train_perc = 80, toResize=False, dims=(32,32)):
+    def load_data(self, train_perc = 80, toResize=False, preprocess = False, dims=(32,32)):
         classes = os.listdir(self.image_dir)
 
         x_train = []
