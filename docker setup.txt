@@ -1,0 +1,7 @@
+docker start -i cefd07174254
+https://stackoverflow.com/a/62482183
+apt-get update
+apt-get install -y libsm6 libxext6 libxrender-dev
+pip install opencv-python
+pip install keras
+pip install matplotlib

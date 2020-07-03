@@ -3,17 +3,17 @@ import os
 
 # 'Autoencoder', 'classifier', 'combined'
 # LogOf = 'Autoencoder'
-# LogOf = 'classifier'
-# LogOf = 'combined'
-LogOf = 'unet'
+#LogOf = 'classifier'
+#LogOf = 'combined'
+#LogOf = 'unet'
 
 # LogOf = 'before_classifier'
-# LogOf = 'after_classifier'
+LogOf = 'combined'
 
-rootDir = LogOf
-# rootDir = 'classifier'
+#rootDir = LogOf
+rootDir = 'combined'
 
-root_dir = "Log/unet_3/" + rootDir
+root_dir = "Log/unet_10/" + rootDir
 
 f = open(os.path.join(root_dir, LogOf + "_log.csv"), 'r')
 #print(f.read())
@@ -26,7 +26,7 @@ range = 1000
 #print(texts)
 
 plots = {'Accuracy': 1, 'Mean Squared Error': 1, 'Loss': 2, 'validation_accuracy': 3, 'validation_loss': 4}
-plot = 'MSE'
+plot = 'Loss'
 
 x = []
 y = []
@@ -36,7 +36,7 @@ for text in texts:
     if(len(values) >= 2):
         #print(values[0], values[1])
         x.append(float(values[0]))
-        y.append(float(values[2]))
+        y.append(float(values[plots[plot]]))
         #print(int(values[0])+1, float(values[1]))
 #plt.xticks(np.arange(0, range, range/10))
 #plt.yticks(np.arange(0, range, range/50))
@@ -44,5 +44,5 @@ plt.xlabel("Epoch")
 plt.ylabel(plot)
 #plt.yticks(np.arange(y.min(), y.max(), 0.005))
 plt.plot(x,y)
-plt.savefig(root_dir + plot + '_Loss' + str(len(x)))
+plt.savefig(root_dir + plot + str(len(x)))
 plt.show()

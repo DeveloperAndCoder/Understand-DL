@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import keras
 from keras.layers import Conv2D, UpSampling2D, BatchNormalization, Dense
 from keras.models import Sequential, load_model
 from keras.utils import multi_gpu_model
@@ -56,7 +57,7 @@ Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
 csv_logger = CSVLogger(log_dir + "combined_log.csv", append=True, separator=';')
 checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=10, verbose=1)
+checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=5, verbose=1)
 
 autoencoder_dir = save_dir
 
@@ -150,7 +151,7 @@ def vgg_loss(y_true, y_pred):
     print(y_true)
     # y_true = decode_predictions(y_true)
     # print(len(y_true))
-    tf.print(y_true)
+    #tf.print(y_true)
     # print(y_true[0][0])
     # exit(1)
     return (y_true - y_pred)

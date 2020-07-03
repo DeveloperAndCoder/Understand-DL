@@ -8,6 +8,8 @@ import argparse
 
 import stl_model
 
+import unet_model as um
+
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--runnum", required=True,
 	help="Run number: eg stl10_4")
@@ -15,6 +17,9 @@ ap.add_argument("-m", "--model", required=False,
 	help="Model name: classifier, combined, autoencoder, etc.", default="")
 ap.add_argument("-mp", "--model_path", required=False,
 	help="Relative path to model", default="")
+ap.add_argument('--testing', dest='test', action='store_true')
+ap.add_argument('--training', dest='test', action='store_false')
+ap.set_defaults(test=True)
 
 ap.add_argument('--weight', dest='weight', action='store_true')
 ap.add_argument('--no-weight', dest='weight', action='store_false')
@@ -43,7 +48,7 @@ def make_array(y):
         a[i][y[i][0]] = 1
     return np.asarray(a)
 
-path = modelpath if modelpath else os.path.join(save_dir, modelname)
+path = modelpath if modelpath else os.path.join(save_dir, modelname + "/f_" + modelname + ".h5")
 model = None
 if args["weight"]:
     model = stl_model.model
@@ -69,21 +74,25 @@ y_train = make_array(y_train)
 y_test = make_array(y_test)
 
 #num_samples = 10
-sample = x_test#[:num_samples]
-img_init = model.predict(sample) #output of pretrained autoencoder
+x = x_test#[:num_samples]
+y = y_test
+if args["test"] == False:
+    x = x_train
+    y = y_train
+#y = model.predict(sample) #output of pretrained autoencoder
 
-pred = model.predict(x_test)  #predict output
-mse_loss = (np.square(pred-y_test)).mean(axis=None)
+pred = model.predict(x)  #predict output
+mse_loss = (np.square(pred-y)).mean(axis=None)
 correctly_predicted = 0
 
-for i, j in zip(pred, y_test):
+for i, j in zip(pred, y):
     max_pos_i = np.argmax(i)
     max_pos_j = np.argmax(j)
     if (max_pos_i == max_pos_j):
         correctly_predicted += 1
 
 print('Correctly predicted', correctly_predicted)
-print('Incorrectly Predicted', y_test.shape[0] - correctly_predicted)
-print('Total', y_test.shape[0])
-print('Accuracy%', correctly_predicted * 100 / y_test.shape[0])
+print('Incorrectly Predicted', y.shape[0] - correctly_predicted)
+print('Total', y.shape[0])
+print("Testing dataset=" + str(args["test"]) + ' | Accuracy%', correctly_predicted * 100 / y.shape[0])
 print('MSE Loss', mse_loss)

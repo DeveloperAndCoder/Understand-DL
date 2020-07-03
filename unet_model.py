@@ -66,8 +66,8 @@ def unet(pretrained_weights=None, input_size=(96, 96, 3)):
 
     model = Model(input=inputs, output=conv10)
     opt = Adam()
-    # model.compile(optimizer= opt, loss='binary_crossentropy', metrics=['mean_squared_error'])
-    model.compile(optimizer=opt, loss=custom_loss, metrics=['mean_squared_error'])
+    model.compile(optimizer= opt, loss='binary_crossentropy', metrics=['mean_squared_error'])
+    #model.compile(optimizer=opt, loss=custom_loss, metrics=['mean_squared_error'])
 
     model.summary()
 

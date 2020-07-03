@@ -5,7 +5,7 @@ from pathlib import Path
 import os
 from keras.callbacks import CSVLogger, ModelCheckpoint
 
-# os.environ["CUDA_VISIBLE_DEVICES"]="2"
+#os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--runnum", required=True,
@@ -36,10 +36,10 @@ print(type(x_train), type(x_test))
 model = unet()
 # exit(1)
 csv_logger = CSVLogger(log_dir + "unet_log.csv", append=True, separator=';')
-checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
+checkpoint_template = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.h5")
 checkpoint = ModelCheckpoint(checkpoint_template, monitor='loss', save_weights_only=False, mode='auto', period=5, verbose=1)
 
-model.fit(x=x_train, y=x_train, epochs=50, callbacks=[csv_logger, checkpoint])
+model.fit(x=x_train, y=x_train, epochs=20, callbacks=[csv_logger, checkpoint])
 
 model_path = os.path.join(save_dir, 'unet.h5')
 model.save(model_path)

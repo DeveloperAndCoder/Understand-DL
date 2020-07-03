@@ -171,7 +171,7 @@ def grad_cam_batch(input_model, images, classes, layer_name):
     return new_cams
 
 def remove_images(filepath):
-    files = glob.glob(filepath + '*.jpg')
+    files = glob.glob(filepath + '*.png')
     for f in files:
         #print(f)
         os.remove(f)
@@ -209,13 +209,13 @@ def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='
     
     if save:
         jetcam = cv2.applyColorMap(np.uint8(255 * gradcam), cv2.COLORMAP_JET)
-        jetcam = (np.float32(jetcam) + load_image(img_path, preprocess=False)*255) / 2
+        overlay = (np.float32(jetcam) + load_image(img_path, preprocess=False)*255) / 2
         Path(filename + '/gradcam/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
         Path(filename + '/guided_backprop/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
         Path(filename + '/guided_gradcam/' + str(args["combined"])).mkdir(parents=True, exist_ok=True)
-        cv2.imwrite(os.path.join(filename + '/gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.jpg'), np.uint8(jetcam))
-        cv2.imwrite(os.path.join(filename + '/guided_backprop/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.jpg'), deprocess_image(gb[0]))
-        cv2.imwrite(os.path.join(filename + '/guided_gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) +'.jpg'), deprocess_image(guided_gradcam[0]))
+        cv2.imwrite(os.path.join(filename + '/gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.png'), np.uint8(overlay))
+        cv2.imwrite(os.path.join(filename + '/guided_backprop/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) + '.png'), deprocess_image(gb[0]))
+        cv2.imwrite(os.path.join(filename + '/guided_gradcam/' + str(args["combined"]), str(num) + '_' + str(correctly_classified) +'.png'), deprocess_image(guided_gradcam[0]))
     
     if visualize:
         plt.figure(figsize=(15, 10))
@@ -236,7 +236,7 @@ def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='
         plt.imshow(np.flip(deprocess_image(guided_gradcam[0]), -1))
         plt.show()
         
-    return gradcam, gb, guided_gradcam
+    return np.uint8(overlay), jetcam, correctly_classified
 
 def make_array(y):
     a = [[0]*10 for i in range(y.shape[0])]
@@ -251,28 +251,86 @@ def test(filename):
     x_test = x_test/255
     y_train = make_array(y_train)
     y_test = make_array(y_test)
+    '''
     if args["combined"]:
         autoencoder = load_model("saved_models/" + args["runnum"] + "/combined/f_auto.h5")
         x_train = autoencoder.predict(x_train)
         x_test = autoencoder.predict(x_test)
+    '''
     guided_model = build_guided_model()
     i=0
-    x=x_test[:20]
-    y=y_test[:20]
-    predictions = model.predict(x)
+    num_samples = 200
+    x=x_test[:num_samples]
+    y=y_test[:num_samples]
+    old_class_predictions = model.predict(x)
     #x = x*255
     Path(filename + '/original/').mkdir(parents=True, exist_ok=True)
+    Path(filename + '/collage/').mkdir(parents=True, exist_ok=True)
+    '''
     remove_images(filename + '/gradcam/' + str(args["combined"]))
     remove_images(filename + '/guided_backprop/' + str(args["combined"]))
     remove_images(filename + '/guided_gradcam/' + str(args["combined"]))
     remove_images(filename + '/original/')
+    remove_images(filename + '/collage/')
+    old_class_overlay = []
+    old_class_attention = []
+    old_class_correct = []
+    print('Running old classifier')
     with alive_bar(x.shape[0]) as bar:
         for img in x:
-            cv2.imwrite(filename + '/original/' + str(i) + '.jpg', img*255)
-            gradcam, gb, guided_gradcam = compute_saliency(model, guided_model, layer_name='block5_conv3',
+            cv2.imwrite(filename + '/original/' + str(i) + '.png', img*255)
+            heatmap, attention, correctly_classified = compute_saliency(model, guided_model, layer_name='block5_conv3',
                                                 img_path=img, predictions=predictions[i], y=y[i], cls=-1, visualize=False, save=True, filename=filename,num=i)
+            old_class_overlay.append(heatmap)
+            old_class_attention.append(attention)
+            old_class_correct.append(correctly_classified)
             i=i+1
             bar()
+    
+    i=0
+    print('Running combined')
+    '''
+    autoencoder = load_model("saved_models/" + args["runnum"] + "/combined/f_auto.h5")
+    x_pred = autoencoder.predict(x)
+    combined_predictions = model.predict(x_pred)
+    '''
+    combined_overlay = []
+    combined_attention = []
+    combined_correct = []
+    with alive_bar(x.shape[0]) as bar:
+        for img in x_pred:
+            #cv2.imwrite(filename + '/original/' + str(i) + '.png', img*255)
+            heatmap, attention, correctly_classified = compute_saliency(model, guided_model, layer_name='block5_conv3',
+                                                img_path=img, predictions=predictions[i], y=y[i], cls=-1, visualize=False, save=True, filename=filename,num=i)
+            combined_overlay.append(heatmap)
+            combined_attention.append(attention)
+            combined_correct.append(correctly_classified)
+            i=i+1
+            bar()
+    '''
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    testlog = open('grad_test_log.txt', 'a')
+    testlog.write('\n'+('~'*50)+'\n')
+    with alive_bar(x.shape[0]) as bar:
+        for i in range(x.shape[0]):
+            old_class_overlay, old_class_attention, old_class_correct = compute_saliency(model, guided_model, layer_name='block5_conv3', img_path=x[i], predictions=old_class_predictions[i], y=y[i], cls=-1, visualize=False, save=True, filename=filename,num=i)
+            combined_overlay, combined_attention, combined_correct = compute_saliency(model, guided_model, layer_name='block5_conv3', img_path=x_pred[i], predictions=combined_predictions[i], y=y[i], cls=-1, visualize=False, save=True, filename=filename,num=i)
+            img1 = old_class_overlay
+            img2 = combined_overlay
+            img1 = cv2.putText(img1, str(old_class_correct),(5,85), font, 0.4, (255,255,255), 1)
+            img2 = cv2.putText(img2, str(combined_correct),(5,85), font, 0.4, (255,255,255), 1)
+            row1 = np.hstack([x[i]*255, img1])
+            row2 = np.hstack([x_pred[i]*255, img2])
+            collage = np.vstack([row1, row2])
+            testlog.write('{}\t{}\t{}\n'.format(i, old_class_correct, combined_correct))
+            testlog.flush()
+            if(old_class_correct != combined_correct):
+                #print(i, old_class_correct[i], combined_correct[i])
+                cv2.imwrite('{}/collage/diff_{}.png'.format(filename, i), collage)
+            else:
+                cv2.imwrite('{}/collage/same_{}.png'.format(filename, i), collage)
+            bar()
+    testlog.close()
 
 if __name__ == '__main__':
     test('Images/gradcam/' + args['runnum'])

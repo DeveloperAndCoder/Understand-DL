@@ -1,0 +1,3 @@
+unet_4 -c stl10_5 -a unet_4
+screen python combined_2_STL10.py -r unet_6 -c saved_models/stl10_5/after_classifier.h5 -a saved_models/unet_4/unet.h5
+python combined_2_STL10.py -r classifer_at_90_combined_train_to_100 -a saved_models/unet_4/unet.h5 -c checkpoint/unet_9/classifier/012_0.38.hdf5

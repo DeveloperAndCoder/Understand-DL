@@ -32,14 +32,18 @@ print("runnum = ", runnum)
 save_dir = "saved_models/" + runnum + "/"
 log_dir = "Log/" + runnum + "/classifier/"
 checkpoint_dir = 'checkpoint/' + runnum + "/classifier/"
+checkpoint_dir_before = 'checkpoint/' + runnum + "/classifier/before"
+checkpoint_dir_after = 'checkpoint/' + runnum + "/classifier/after"
 
 Path(save_dir).mkdir(parents=True, exist_ok=True)
 Path(log_dir).mkdir(parents=True, exist_ok=True)
 Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
+Path(checkpoint_dir_before).mkdir(parents=True, exist_ok=True)
+Path(checkpoint_dir_after).mkdir(parents=True, exist_ok=True)
 
 batch_size = 32
 num_of_classes = 10
-num_epochs = 50
+num_epochs = 20
 # save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
 
 
@@ -135,7 +139,7 @@ model.compile(loss='categorical_crossentropy',
             )
 
 csv_logger1 = CSVLogger(log_dir + "before_classifier_log.csv", append=True, separator=';')
-checkpoint_template1 = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
+checkpoint_template1 = os.path.join(checkpoint_dir_before, "{epoch:03d}_{loss:.2f}.hdf5")
 checkpoint1 = ModelCheckpoint(checkpoint_template1, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
 
 model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger1, checkpoint1])
@@ -170,7 +174,7 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 	metrics=["accuracy"])
 
 csv_logger2 = CSVLogger(log_dir + "after_classifier_log.csv", append=True, separator=';')
-checkpoint_template2 = os.path.join(checkpoint_dir, "{epoch:03d}_{loss:.2f}.hdf5")
+checkpoint_template2 = os.path.join(checkpoint_dir_after, "{epoch:03d}_{loss:.2f}.hdf5")
 checkpoint2 = ModelCheckpoint(checkpoint_template2, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
 
 # train the model again, this time fine-tuning *both* the final set
