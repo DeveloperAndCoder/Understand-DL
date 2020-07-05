@@ -90,7 +90,7 @@ def visualize_classifier(x, total_imgs=990):
         output = outputs[i] # Output of each layer
         save_dir = 'Images/Intermediate/' + args["runnum"] + "/Classifier/" + layer_name
         Path(save_dir).mkdir(parents=True, exist_ok=True)
-        with alive_bar(min(total_imgs, output.shape[0])) as bar:
+        with alive_bar(output.shape[0]) as bar:
             for j in range(0, min(total_imgs, output.shape[0])):     # For each image
                 for k in range(0, output.shape[3]): # For each channel
                     name = '{:04d}_{:03d}.png'.format(j, k) # name - Image_Channel
@@ -117,7 +117,7 @@ def visualize_combined(x, total_imgs=990):
         output = outputs[i] # Output of each layer
         save_dir = 'Images/Intermediate/' + args["runnum"] + "/Combined/" + layer_name
         Path(save_dir).mkdir(parents=True, exist_ok=True)
-            with alive_bar(min(total_imgs, output.shape[0])) as bar:
+        with alive_bar(output.shape[0]) as bar:
             for j in range(0, min(total_imgs, output.shape[0])):     # For each image
                 for k in range(0, output.shape[3]): # For each channel
                     name = '{:04d}_{:03d}.png'.format(j, k) # name - Image_Channel
