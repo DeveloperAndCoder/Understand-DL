@@ -42,8 +42,10 @@ print("runnum:", runnum)
 
 save_dir = "saved_models/{}/".format(runnum)
 
+num_of_classes = 6
+
 def make_array(y):
-    a = [[0]*10 for i in range(y.shape[0])]
+    a = [[0]*num_of_classes for i in range(y.shape[0])]
     for i in range(y.shape[0]):
         a[i][y[i][0]] = 1
     return np.asarray(a)
@@ -65,6 +67,9 @@ elif dataset == "cifar":
     (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 elif dataset == "imagenet":
     (x_train, y_train), (x_test, y_test) = collect_data.Imagenet.load_data(collect_data.Imagenet(), toResize=True, dims=(224,224))
+elif dataset == "intel":
+    (x_train, y_train), (x_test, y_test) = collect_data.Intel.load_data(collect_data.Intel(), toResize=True)
+    num_of_classes = 6
 else:
     exit(1)
 print('Number of test samples:', y_test.shape[0])

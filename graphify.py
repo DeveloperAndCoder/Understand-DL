@@ -4,16 +4,16 @@ import os
 # 'Autoencoder', 'classifier', 'combined'
 # LogOf = 'Autoencoder'
 #LogOf = 'classifier'
-#LogOf = 'combined'
+LogOf = 'combined'
 #LogOf = 'unet'
 
 # LogOf = 'before_classifier'
-LogOf = 'combined'
+# LogOf = 'after_classifier'
 
-#rootDir = LogOf
+#rootDir = 'classifier'
 rootDir = 'combined'
 
-root_dir = "Log/unet_10/" + rootDir
+root_dir = "Log/unet_9/" + rootDir
 
 f = open(os.path.join(root_dir, LogOf + "_log.csv"), 'r')
 #print(f.read())
@@ -26,7 +26,7 @@ range = 1000
 #print(texts)
 
 plots = {'Accuracy': 1, 'Mean Squared Error': 1, 'Loss': 2, 'validation_accuracy': 3, 'validation_loss': 4}
-plot = 'Loss'
+plot = 'Accuracy'
 
 x = []
 y = []

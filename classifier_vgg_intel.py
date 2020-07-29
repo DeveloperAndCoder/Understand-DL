@@ -43,15 +43,16 @@ Path(checkpoint_dir_before).mkdir(parents=True, exist_ok=True)
 Path(checkpoint_dir_after).mkdir(parents=True, exist_ok=True)
 
 batch_size = 32
-num_of_classes = 10
+num_of_classes = 6
 num_epochs = 50
 # save_dir = os.path.join(os.getcwd(), 'saved_models/' + runnum)
 
 
 # The data, split between train and test sets:
 #(x_train, y_train), (x_test, y_test) = stl_to_dataset.get_numpy(0.8)
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
-# (x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
+#(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+#(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10())
+(x_train, y_train), (x_test, y_test) = collect_data.Intel.load_data(collect_data.Intel())
 
 #exit()
 #print(np.max(y_train))
@@ -91,7 +92,7 @@ baseModel = VGG16(
     weights="imagenet",
     include_top=False,
     # pooling='max',
-    input_shape = (32,32,3)
+    input_shape = (144,144,3)
     )
 
 baseModel.summary()
@@ -142,7 +143,7 @@ model.compile(loss='categorical_crossentropy',
 
 csv_logger1 = CSVLogger(log_dir + "before_classifier_log.csv", append=True, separator=';')
 checkpoint_template1 = os.path.join(checkpoint_dir_before, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint1 = ModelCheckpoint(checkpoint_template1, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
+checkpoint1 = ModelCheckpoint(checkpoint_template1, monitor='loss', save_weights_only=False, mode='auto', period=5, verbose=1)
 
 model.fit(x_train, y_train, epochs=num_epochs, batch_size=32, callbacks=[csv_logger1, checkpoint1])
 
@@ -177,7 +178,7 @@ model.compile(loss="categorical_crossentropy", optimizer=opt,
 
 csv_logger2 = CSVLogger(log_dir + "after_classifier_log.csv", append=True, separator=';')
 checkpoint_template2 = os.path.join(checkpoint_dir_after, "{epoch:03d}_{loss:.2f}.hdf5")
-checkpoint2 = ModelCheckpoint(checkpoint_template2, monitor='loss', save_weights_only=False, mode='auto', period=2, verbose=1)
+checkpoint2 = ModelCheckpoint(checkpoint_template2, monitor='loss', save_weights_only=False, mode='auto', period=5, verbose=1)
 
 # train the model again, this time fine-tuning *both* the final set
 # of CONV layers along with our set of FC layers

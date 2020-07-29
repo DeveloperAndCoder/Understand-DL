@@ -17,7 +17,7 @@ def custom_loss(y_true, y_pred):
     # return L1
     return tf.math.add(ssim, L1)
 
-def unet(pretrained_weights=None, input_size=(96, 96, 3)):
+def unet(pretrained_weights=None, input_size=(144, 144, 3)):
     inputs = Input(input_size)
     conv1 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(inputs)    # 96x96x64
     conv1 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv1)     # 96x96x64
@@ -61,6 +61,7 @@ def unet(pretrained_weights=None, input_size=(96, 96, 3)):
     # merge9 = concatenate([conv1, up9], axis=3)
     conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(up9) #merge9
     conv9 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
+    
     # conv9 = Conv2D(32, 3, activation='relu', padding='same', kernel_initializer='he_normal')(conv9)
     conv10 = Conv2D(3, 1, activation='sigmoid')(conv9)
 

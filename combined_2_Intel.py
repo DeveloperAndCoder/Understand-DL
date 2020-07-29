@@ -23,7 +23,7 @@ import argparse
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 # The GPU id to use, "0" to  "7"
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="4"
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-r", "--runnum", required=True,
@@ -67,7 +67,7 @@ if autoencoder_path == "":
 #autoencoder = load_model('saved_models/autoencoder.h5')
 autoencoder = load_model(autoencoder_path)
 # classifier model= load_model(save_dir+'/classifier.h5')
-num_of_classes = 10
+num_of_classes = 6
 
 vgg = True
 
@@ -90,7 +90,8 @@ classifier = load_model(classifier_path)
 #(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
 #(x_train, y_train), (x_test, y_test) = get_numpy()
 #(x_train, y_train), (x_test, y_test) = collect_data.Imagenet.load_data(collect_data.Imagenet(), toResize=True, dims=(224,224))
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+(x_train, y_train), (x_test, y_test) = collect_data.Intel.load_data(collect_data.Intel(), train_perc=70)
+#(x_train, y_train), (x_test, y_test) = cifar10.load_data()
 ### cifar - (50k, 32, 32, 3) (50k, 1) (10k, 32, 32, 3) (10k, 1)
 x_train = x_train/255
 x_test = x_test/255

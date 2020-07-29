@@ -114,7 +114,8 @@ class STL10:
                 if (toResize) :
                     im = self.resize(im, dims)
                 arr = np.asarray(im)
-                #print(im.shape)
+                #print(arr.shape)
+                #exit(1)
                 if (taken * 100 <= tot * train_perc):
                     x_train.append(arr)
                     y_train.append(int(c)-1)
@@ -138,6 +139,60 @@ class STL10:
             (x_train, y_train), (x_test, y_test) = pre_process(x_train, y_train, x_test, y_test)
         # print(type(x_train), x_train.shape, x_train[0].shape)
 
+        return (x_train, y_train), (x_test, y_test)
+    
+class Intel:
+    image_dir = 'Intel/seg_train/'
+    
+    def set_image_dir(self, dir_path):
+        self.image_dir = dir_path
+
+    def resize(self, img, dims = (144, 144)):
+        return img.resize(dims)
+
+    def load_data(self, train_perc = 70, toResize=False, preprocess = False, dims=(144,144)):
+        classes = os.listdir(self.image_dir)
+
+        x_train = []
+        y_train = []
+        x_test = []
+        y_test = []
+
+        for c in classes:
+            taken = 0
+            imgs = os.listdir(self.image_dir + c)
+            tot = len([img for img in os.listdir(self.image_dir + c)])
+            for img in imgs:
+                im = Image.open(self.image_dir + c + '/' + img)
+                if (toResize or True) :
+                    im = self.resize(im, dims)
+                arr = np.asarray(im)
+                #print(arr.shape)
+                #exit(1)
+                if (taken * 100 <= tot * train_perc):
+                    x_train.append(arr)
+                    y_train.append(int(c)-1)
+                    taken += 1
+                else :
+                    x_test.append(arr)
+                    y_test.append(int(c)-1)
+                    # print(y_test[-1])
+            print('took', taken)
+
+        print("Done loading", len(x_train))
+        x_train = np.array(x_train)
+        x_test = np.array(x_test)
+        y_train = np.array(y_train)
+        y_test = np.array(y_test)
+        y_train = y_train.reshape((y_train.shape[0]), 1)
+        y_test = y_test.reshape((y_test.shape[0]), 1)
+        print('x_train kundli', type(x_train), x_train.shape, x_train[0].shape)
+        
+        if preprocess:
+            # pre_process(x_train, y_train, x_test, y_test)
+            (x_train, y_train), (x_test, y_test) = pre_process(x_train, y_train, x_test, y_test)
+        # print(type(x_train), x_train.shape, x_train[0].shape)
+        #exit(1) 
         return (x_train, y_train), (x_test, y_test)
 
 if __name__ == '__main__':

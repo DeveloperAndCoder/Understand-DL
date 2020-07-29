@@ -6,6 +6,7 @@ import cv2
 from matplotlib import pyplot as plt
 from keras import backend as K
 from keras.preprocessing import image
+from keras.datasets import cifar10
 from keras.applications.vgg16 import VGG16, preprocess_input, decode_predictions
 from keras.models import Sequential, load_model
 import tensorflow as tf
@@ -49,7 +50,7 @@ def build_model():
         return load_model("saved_models/" + args["runnum"] + "/combined/f_class.h5")
     #return VGG16(include_top=True, weights='imagenet')
 
-H, W = 96, 96 # Input shape, defined by the model (model.input_shape)
+H, W = 144, 144 # Input shape, defined by the model (model.input_shape)
 # ---------------------------------------------------------------------
 
 def load_image(path, preprocess=True):
@@ -239,14 +240,15 @@ def compute_saliency(model, guided_model, img_path, predictions, y, layer_name='
     return np.uint8(overlay), jetcam, correctly_classified
 
 def make_array(y):
-    a = [[0]*10 for i in range(y.shape[0])]
+    a = [[0]*6 for i in range(y.shape[0])]
     for i in range(y.shape[0]):
         a[i][y[i][0]] = 1
     return np.asarray(a)
 
 def test(filename):
     model = build_model()
-    (x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
+    #(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    (x_train, y_train), (x_test, y_test) = collect_data.Intel.load_data(collect_data.Intel(), train_perc = 80)
     x_train = x_train/255
     x_test = x_test/255
     y_train = make_array(y_train)

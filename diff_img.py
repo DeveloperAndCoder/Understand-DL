@@ -27,7 +27,8 @@ def make_array(y):
         a[i][y[i][0]] = 1
     return np.asarray(a)
 
-(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
+#(x_train, y_train), (x_test, y_test) = collect_data.STL10.load_data(collect_data.STL10(), train_perc = 80)
+(x_train, y_train), (x_test, y_test) = collect_data.Intel.load_data(collect_data.Intel())
 x_train = x_train/255
 x_test = x_test/255
 y_train = make_array(y_train)
